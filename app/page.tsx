@@ -109,6 +109,7 @@ function Board({ xIsNext, onPlay, squares }: Board) {
   return <>
     <div className="mb-4 text-2xl">{status}</div>
     <div className={boardRowStyles}>
+      <Square value={squares![0]} onSquareClick={() => handleClick(0)} />
       <Square value={squares![1]} onSquareClick={() => handleClick(1)} />
       <Square value={squares![2]} onSquareClick={() => handleClick(2)} />
     </div>
