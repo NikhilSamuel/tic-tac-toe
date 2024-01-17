@@ -1,12 +1,13 @@
 "use client"
 import { useState } from "react";
 
-const squareStyles = "bg-[#fff] w-20 h-20 -mr-px -mt-px text-center float-left text-xl font-bold border-4 border-solid border-#999 p-0";
+const squareStyles = " w-20 h-20 -mr-px -mt-px text-center float-left text-xl font-bold border-4 border-solid border-red p-0";
 const boardRowStyles = "after:table after:clear-both after:content-['']";
 
 interface Square {
   value: string;
-  onSquareClick: any
+  onSquareClick: any;
+  highLightBorder: any;
 }
 
 interface Board {
@@ -61,8 +62,13 @@ export default function TicTacToe() {
     </div>
   )
 }
-function Square({value, onSquareClick}: Square) {
-  return <button className={squareStyles} onClick={onSquareClick}>{value} </button>
+function Square({ value, onSquareClick, highLightBorder }: Square) {
+  let borderColorWinner = '', valueColor = '';
+  value === 'O' ? (valueColor = 'text-orange-600') : (valueColor = 'text-green-600');
+  if (highLightBorder) {
+    borderColorWinner = 'border-indigo-500'
+  }
+  return <button className={`${squareStyles} ${borderColorWinner} ${valueColor}`} onClick={onSquareClick}>{value} </button>
 }
 function calculateWinner(squares: any) {
   const lines = [
@@ -78,13 +84,12 @@ function calculateWinner(squares: any) {
   for(let line of lines) {
     const [a, b, c] = line;
     if (squares[a] && (squares[a] === squares[b] && squares[a] === squares[c])) {
-      return squares[a];
+      return [squares[a], [a,b,c]];
     }
   };
   return null;
 }
 function Board({ xIsNext, onPlay, squares }: Board) {
-
   function handleClick(i: number) {
     if (squares![i] || calculateWinner(squares)) return;
     const nextSquares = squares!.slice();
@@ -97,31 +102,38 @@ function Board({ xIsNext, onPlay, squares }: Board) {
     onPlay(nextSquares)
   }
 
-  const winner = calculateWinner(squares);
-  let status;
+  const [winner, line] = calculateWinner(squares) || [];
+  const draw = squares?.map(square => Boolean(square))
+  let status, statusColor = '';
   if (winner) {
     status = `Winner: ${winner}`;
+    statusColor = 'text-blue-600'
+  }
+  else if(draw?.includes(false)) {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+    statusColor = 'text-green-600'
   }
   else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+    status = ' Game Draw Monu'
+    statusColor = 'text-red-600'
   }
 
   return <>
-    <div className="mb-4 text-2xl">{status}</div>
+    <div className={`${statusColor} mb-4 text-2xl`}>{status}</div>
     <div className={boardRowStyles}>
-      <Square value={squares![0]} onSquareClick={() => handleClick(0)} />
-      <Square value={squares![1]} onSquareClick={() => handleClick(1)} />
-      <Square value={squares![2]} onSquareClick={() => handleClick(2)} />
+      <Square value={squares![0]} onSquareClick={() => handleClick(0)} highLightBorder={line?.includes?.(0)} />
+      <Square value={squares![1]} onSquareClick={() => handleClick(1)} highLightBorder={line?.includes?.(1)} />
+      <Square value={squares![2]} onSquareClick={() => handleClick(2)} highLightBorder={line?.includes?.(2)} />
     </div>
     <div className={boardRowStyles}>
-      <Square value={squares![3]} onSquareClick={() => handleClick(3)} />
-      <Square value={squares![4]} onSquareClick={() => handleClick(4)} />
-      <Square value={squares![5]} onSquareClick={() => handleClick(5)} />
+      <Square value={squares![3]} onSquareClick={() => handleClick(3)} highLightBorder={line?.includes?.(3)} />
+      <Square value={squares![4]} onSquareClick={() => handleClick(4)} highLightBorder={line?.includes?.(4)} />
+      <Square value={squares![5]} onSquareClick={() => handleClick(5)} highLightBorder={line?.includes?.(5)} />
     </div>
     <div className={boardRowStyles}>
-      <Square value={squares![6]} onSquareClick={() => handleClick(6)} />
-      <Square value={squares![7]} onSquareClick={() => handleClick(7)} />
-      <Square value={squares![8]} onSquareClick={() => handleClick(8)} />
+      <Square value={squares![6]} onSquareClick={() => handleClick(6)} highLightBorder={line?.includes?.(6)} />
+      <Square value={squares![7]} onSquareClick={() => handleClick(7)} highLightBorder={line?.includes?.(7)} />
+      <Square value={squares![8]} onSquareClick={() => handleClick(8)} highLightBorder={line?.includes?.(8)} />
     </div>
   </>;
 }
